@@ -12,4 +12,5 @@ public interface IFileMetadataService
     List<FileMetadata> getFileMetadataListByConditions(ShowDirectoryAndFileParam showFileParam);
     String getFilePathByFileId(long id);
     String generateUserFilePath(long userId, Long parentDirectoryId, String fileName);
+    List<FileMetadata> getFileIdsInDirectoryIds(long userId, List<Long> directoryIds);
 }

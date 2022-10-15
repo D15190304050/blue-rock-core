@@ -56,4 +56,10 @@ public class FileMetadataService implements IFileMetadataService
         String directoryPath = userDirectoryService.getDirectoryPathById(parentDirectoryId);
         return userId + "-" + directoryPath + fileName;
     }
+
+    @Override
+    public List<FileMetadata> getFileIdsInDirectoryIds(long userId, List<Long> directoryIds)
+    {
+        return fileMetadataMapper.getFilesInDirectories(userId, directoryIds);
+    }
 }

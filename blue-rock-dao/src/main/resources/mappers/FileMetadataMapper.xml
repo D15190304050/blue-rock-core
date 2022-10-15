@@ -79,4 +79,25 @@
         VALUES
         (#{bucketName}, #{objectName}, #{fileName}, '', #{directoryId}, #{userId})
     </insert>
+
+    <select id="getFilesInDirectories" resultMap="BaseResultMap">
+        SELECT id, bucket_name, object_name
+        FROM file_metadata
+        WHERE user_id = #{userId}
+          AND directory_id IN
+        <foreach collection="directoryIds" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <delete id="deleteFilesByIds">
+        DELETE FROM file_metadata
+        WHERE user_id = #{userId}
+          AND id IN
+            <foreach collection="fileIds" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+    </delete>
+
+
 </mapper>

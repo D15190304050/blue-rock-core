@@ -1,5 +1,6 @@
 package bluerock.service;
 
+import bluerock.api.IFileOperationService;
 import bluerock.api.IUserDirectoryService;
 import bluerock.api.IFileMetadataService;
 import bluerock.dao.UserDirectoryMapper;
@@ -28,6 +29,9 @@ public class UserUserDirectoryService implements IUserDirectoryService
 
     @Autowired
     private IFileMetadataService fileMetadataService;
+
+    @Autowired
+    private IFileOperationService fileOperationService;
 
     @Override
     public ServiceResponse<List<UserDirectory>> showDirectories(ShowDirectoryAndFileParam showParam)
@@ -153,8 +157,20 @@ public class UserUserDirectoryService implements IUserDirectoryService
         // Delete the records of the files in the database.
         // Delete the files in the minio.
 
+        long userId = deleteParam.getUserId();
+
         List<Long> childrenDirectoryIds = getAllChildrenIds(deleteParam.getId());
 
-        return null;
+        List<FileMetadata> fileMetadataList = fileMetadataService.getFileIdsInDirectoryIds(userId, childrenDirectoryIds);
+        boolean deletionResult = fileOperationService.deleteFiles(fileMetadataList);
+
+        int directoryDeletionCount = userDirectoryMapper.deleteDirectoriesByIdsAndUserId(userId, childrenDirectoryIds);
+
+        boolean result = directoryDeletionCount == childrenDirectoryIds.size() && deletionResult;
+
+        if (result)
+            return ServiceResponse.buildSuccessResponse(true);
+        else
+            return ServiceResponse.buildErrorResponse(-5, "Error when executing deletion operations, please check the log...");
     }
 }

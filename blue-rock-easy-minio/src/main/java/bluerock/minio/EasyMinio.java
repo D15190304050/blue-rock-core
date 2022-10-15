@@ -3,6 +3,8 @@ package bluerock.minio;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
+import io.minio.messages.DeleteError;
+import io.minio.messages.DeleteObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -122,5 +124,29 @@ public class EasyMinio
                 .build());
 
         log.info("Object composition successfully...");
+    }
+
+    public boolean deleteObjects(String bucketName, List<String> objectNames) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException
+    {
+        List<DeleteObject> objectsToDelete = new ArrayList<>();
+        for (String objectName : objectNames)
+            objectsToDelete.add(new DeleteObject(objectName));
+
+        Iterable<Result<DeleteError>> deletionResults = minioClient.removeObjects(
+                RemoveObjectsArgs
+                        .builder()
+                        .bucket(bucketName)
+                        .objects(objectsToDelete)
+                        .build());
+
+        int errorCount = 0;
+        for (Result<DeleteError> result : deletionResults)
+        {
+            errorCount++;
+            DeleteError error = result.get();
+            log.error("Error in deleting object " + error.objectName() + "; " + error.message());
+        }
+
+        return errorCount == 0;
     }
 }

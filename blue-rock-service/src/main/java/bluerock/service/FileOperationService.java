@@ -15,8 +15,10 @@ import bluerock.minio.IProgressListener;
 import bluerock.params.BatchMultipartFileParam;
 import bluerock.params.CanUploadFileParam;
 import bluerock.params.MultipartFileParam;
+import dataworks.ExceptionInfoFormatter;
 import dataworks.autoconfig.web.LogArgumentsAndResponse;
 import dataworks.web.commons.ServiceResponse;
+import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -118,5 +124,29 @@ public class FileOperationService implements IFileOperationService
         return null;
     }
 
+    @Override
+    public boolean deleteFiles(List<FileMetadata> fileMetadataList)
+    {
+        FileMetadata firstElement = fileMetadataList.get(0);
+        long userId = firstElement.getUserId();
+        String bucketName = firstElement.getBucketName();
 
+        // Delete records of the files in the database.
+        List<Long> fileIds = fileMetadataList.stream().map(FileMetadata::getId).collect(Collectors.toList());
+        fileMetadataMapper.deleteFilesByIds(userId, fileIds);
+
+        List<String> objectNames = fileMetadataList.stream().map(FileMetadata::getObjectName).collect(Collectors.toList());
+
+        try
+        {
+            // TODO: Make this operation async.
+            return easyMinio.deleteObjects(bucketName, objectNames);
+        }
+        catch (ServerException | InsufficientDataException | ErrorResponseException | IOException | NoSuchAlgorithmException | InvalidKeyException | InvalidResponseException | XmlParserException | InternalException e)
+        {
+            String exceptionStackTrace = ExceptionInfoFormatter.formatMessageAndStackTrace(e);
+            log.error("Error when trying to delete files in MinIO..., " + exceptionStackTrace);
+            return false;
+        }
+    }
 }

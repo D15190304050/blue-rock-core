@@ -25,8 +25,8 @@ public class ProgressInputStream extends FilterInputStream
         }
         catch (IOException e)
         {
-            String exceptionInfo = ExceptionInfoFormatter.formatMessageAndStackTrace(e);
-            log.error("Error when getting available bytes of input stream..., " + exceptionInfo);
+            String exceptionStackTrace = ExceptionInfoFormatter.formatMessageAndStackTrace(e);
+            log.error("Error when getting available bytes of input stream..., " + exceptionStackTrace);
             totalLength = 0;
         }
         readLength = 0;
