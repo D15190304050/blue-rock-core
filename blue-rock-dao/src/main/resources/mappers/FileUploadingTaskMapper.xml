@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bluerock.dao.FileUploadingTaskMapper">
+    <resultMap id="BaseResultMap" type="bluerock.domain.FileUploadingTask">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="metadata_id" jdbcType="BIGINT" property="metadataId"/>
+        <result column="total_byte_count" jdbcType="BIGINT" property="totalByteCount"/>
+        <result column="uploaded_byte_count" jdbcType="BIGINT" property="uploadedByteCount"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="creation_time" jdbcType="TIMESTAMP" property="creationTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="state" jdbcType="INTEGER" property="state"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="bluerock.domain.FileUploadingTask">
+        <selectKey keyProperty="id" resultType="long" order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+
+        INSERT INTO file_uploading_task
+        (
+            `metadata_id`,
+            `total_byte_count`,
+            `uploaded_byte_count`,
+            `user_id`,
+            `creation_time`,
+            `update_time`,
+            `state`
+        )
+        VALUES
+        (
+            #{metadataId},
+            #{totalByteCount},
+            #{uploadedByteCount},
+            #{userId},
+            #{creationTime},
+            #{updateTime},
+            #{state}
+        )
+    </insert>
+
+    <update id="updateUploadedBytesById">
+        UPDATE file_uploading_task
+        SET uploaded_byte_count = #{newUpdatedByteCount}
+        WHERE id = #{id}
+    </update>
+
+    <update id="setTaskStateById">
+        UPDATE file_uploading_task
+        SET state = #{state}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getTaskById" resultMap="BaseResultMap">
+        SELECT
+            id,
+            metadata_id,
+            total_byte_count,
+            uploaded_byte_count,
+            user_id,
+            creation_time,
+            update_time,
+            state
+        FROM file_uploading_task
+        WHERE id = #{id}
+    </select>
+</mapper>

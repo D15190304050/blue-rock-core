@@ -1,0 +1,122 @@
+package bluerock.service;
+
+import bluerock.api.IFileOperationService;
+import bluerock.dao.FileMetadataMapper;
+import bluerock.dao.FilePartMapper;
+import bluerock.dao.FileUploadingTaskMapper;
+import bluerock.dao.UserFileMapper;
+import bluerock.domain.FileMetadata;
+import bluerock.domain.FileUploadingTask;
+import bluerock.domain.UserFile;
+import bluerock.minio.Bucket;
+import bluerock.minio.EasyMinio;
+import bluerock.minio.FileUploadingMonitor;
+import bluerock.minio.IProgressListener;
+import bluerock.params.BatchMultipartFileParam;
+import bluerock.params.CanUploadFileParam;
+import bluerock.params.MultipartFileParam;
+import dataworks.autoconfig.web.LogArgumentsAndResponse;
+import dataworks.web.commons.ServiceResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+@Slf4j
+@Service
+@LogArgumentsAndResponse
+public class FileOperationService implements IFileOperationService
+{
+    @Autowired
+    private EasyMinio easyMinio;
+
+    @Autowired
+    private UserFileMapper userFileMapper;
+
+    @Autowired
+    private FileMetadataMapper fileMetadataMapper;
+
+    @Autowired
+    private FilePartMapper filePartMapper;
+
+    @Autowired
+    private FileUploadingTaskMapper fileUploadingTaskMapper;
+
+    @Autowired
+    private FileMetadataService fileMetadataService;
+
+    /**
+     * Call this method before executing real uploading operation.
+     * @param canUploadFileParam
+     * @return
+     */
+    public ServiceResponse<Boolean> canUploadFile(@Validated CanUploadFileParam canUploadFileParam)
+    {
+        int fileCount = fileMetadataMapper.countFileByCondition(canUploadFileParam);
+        if (fileCount == 0)
+            return ServiceResponse.buildSuccessResponse(true);
+        else
+            return ServiceResponse.buildSuccessResponse(false, "File exists.");
+    }
+
+    @Override
+    @Transactional
+    public ServiceResponse<String> uploadFile(@Validated MultipartFileParam multipartFileParam)
+    {
+        MultipartFile file = multipartFileParam.getFile();
+        Long parentDirectoryId = multipartFileParam.getParentDirectoryId();
+        long userId = multipartFileParam.getUserId();
+
+        String fileName = file.getName();
+
+        // Save metadata to database (file_metadata, user_file).
+        FileMetadata fileMetadata = new FileMetadata();
+        fileMetadata.setUserId(userId);
+        fileMetadata.setFileName(fileName);
+        fileMetadata.setDirectoryId(parentDirectoryId);
+        fileMetadata.setBucketName(Bucket.getBucketName(userId));
+        fileMetadata.setObjectName(fileMetadataService.generateUserFilePath(userId, parentDirectoryId, fileName));
+        fileMetadataMapper.insertNew(fileMetadata);
+
+        long fileId = fileMetadata.getId();
+        UserFile userFile = new UserFile();
+        userFile.setUserId(userId);
+        userFile.setFileId(fileId);
+        userFileMapper.insert(userFile);
+
+        // Upload data by upload task manager.
+        // 1) Create the uploading task.
+        // 2) Keep monitoring the uploading progress.
+
+        IProgressListener progressListener = progress ->
+        {
+            // Send progress to frontend through websocket.
+            ;
+        };
+
+        try
+        {
+            FileUploadingMonitor fileUploadingMonitor = new FileUploadingMonitor(easyMinio, fileMetadata, progressListener, filePartMapper, fileUploadingTaskMapper);
+            Thread fileUploadingThread = fileUploadingMonitor.start(file);
+            FileUploadingTask fileUploadingTask = fileUploadingMonitor.getFileUploadingTask();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public ServiceResponse<Boolean> uploadFiles(BatchMultipartFileParam batchMultipartFileParam)
+    {
+        return null;
+    }
+
+
+}

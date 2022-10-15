@@ -1,0 +1,13 @@
+spring:
+    datasource:
+        druid:
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            url: jdbc:mysql://localhost:3306/blue_rock?useUnicode=true&characterEncoding=utf8
+            username: DinoStark
+            password: non-feeling
+
+bluerock:
+    easyminio:
+        endpoint: http://localhost:9000
+        access-key: minioadmin
+        secret-key: minioadmin

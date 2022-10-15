@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bluerock.dao.UserDirectoryMapper">
+    <resultMap id="BaseResultMap" type="bluerock.domain.UserDirectory">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="path" jdbcType="VARCHAR" property="path"/>
+        <result column="creation_time" jdbcType="TIMESTAMP" property="creationTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="in_trash" jdbcType="INTEGER" property="inTrash"/>
+    </resultMap>
+
+    <select id="showDirectoriesByConditions" resultMap="BaseResultMap">
+        SELECT
+            id,
+            parent_id,
+            user_id,
+            name,
+            path,
+            creation_time,
+            update_time,
+            in_trash
+        FROM user_directory
+        WHERE user_id = #{userId}
+        <if test="parentDirectoryId != null">
+            AND parent_id = #{parentDirectoryId}
+        </if>
+        <if test="parentDirectoryId == null">
+            AND parent_id IS NULL
+        </if>
+        <if test="pattern != null and pattern != ''">
+            AND name LIKE CONCAT('%', #{pattern}, '%')
+        </if>
+        <if test="sortField != null and sortField != ''">
+            ORDER BY ${sortField} ${sortOrder}
+        </if>
+    </select>
+
+    <select id="countDirectoryByNameAndParent" resultType="int">
+        SELECT COUNT(*)
+        FROM user_directory
+        WHERE user_id = #{userId}
+          AND name = #{name}
+          AND parent_id = #{parentDirectoryId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO user_directory
+        ( parent_id, user_id, name, path )
+        VALUES
+        (#{parentId}, #{userId}, #{name}, #{path})
+    </insert>
+
+    <select id="getDirectoryById" resultMap="BaseResultMap">
+        SELECT
+            id,
+            parent_id,
+            user_id,
+            name,
+            path,
+            creation_time,
+            update_time,
+            in_trash
+        FROM user_directory
+        WHERE id = #{id}
+    </select>
+
+    <select id="countDirectoryByIdAndUserId" resultType="int">
+        SELECT COUNT(*) FROM user_directory WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <update id="updateNameById">
+        UPDATE user_directory SET name = #{name} WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <select id="findChildrenDirectoryIds" resultType="string">
+        SELECT GET_CHILDREN_DIRECTORY_IDS(#{rootDirectoryId})
+    </select>
+
+    <delete id="deleteDirectoriesByIdsAndUserId">
+        DELETE FROM user_directory
+        WHERE user_id = #{userId}
+          AND id IN
+            <foreach collection="ids" open="(" close=")" item="item" separator=",">
+                #{item}
+            </foreach>
+    </delete>
+</mapper>

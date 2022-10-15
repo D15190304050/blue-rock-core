@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bluerock.dao.FilePartMapper">
+    <resultMap id="BaseResultMap" type="bluerock.domain.FilePart">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="task_id" jdbcType="BIGINT" property="taskId"/>
+        <result column="object_name" jdbcType="VARCHAR" property="objectName"/>
+        <result column="byte_count" jdbcType="BIGINT" property="byteCount"/>
+        <result column="uploading_time" jdbcType="TIMESTAMP" property="uploadingTime"/>
+    </resultMap>
+
+    <select id="countFilePartsByTaskId" resultType="int">
+        SELECT COUNT(*)
+        FROM file_part
+        WHERE task_id = #{taskId}
+    </select>
+
+    <insert id="insert">
+        <selectKey keyProperty="id" resultType="long" order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+
+        INSERT INTO file_part
+        (
+            task_id,
+            object_name,
+            byte_count,
+            uploading_time
+        )
+        VALUES
+        (
+            #{taskId},
+            #{objectName},
+            #{byteCount},
+            #{uploadingTime}
+        )
+    </insert>
+
+    <select id="getPartNamesByTaskId" resultType="string">
+        SELECT object_name
+        FROM file_part
+        WHERE task_id = #{taskId}
+    </select>
+</mapper>

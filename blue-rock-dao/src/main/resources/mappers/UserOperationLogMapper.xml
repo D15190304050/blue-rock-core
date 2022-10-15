@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bluerock.dao.UserOperationLogMapper">
+    <resultMap id="BaseResultMap" type="bluerock.domain.UserOperationLog">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="operation_type_id" jdbcType="INTEGER" property="operationTypeId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="detail" jdbcType="VARCHAR" property="detail"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from user_operation_log
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="bluerock.domain.UserOperationLog">
+        insert into user_operation_log (id, operation_type_id, user_id,
+                                        detail)
+        values (#{id,jdbcType=BIGINT}, #{operationTypeId,jdbcType=INTEGER}, #{userId,jdbcType=BIGINT},
+                #{detail,jdbcType=VARCHAR})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="bluerock.domain.UserOperationLog">
+        update user_operation_log
+        set operation_type_id = #{operationTypeId,jdbcType=INTEGER},
+            user_id           = #{userId,jdbcType=BIGINT},
+            detail            = #{detail,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select id, operation_type_id, user_id, detail
+        from user_operation_log
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select id, operation_type_id, user_id, detail
+        from user_operation_log
+    </select>
+</mapper>
