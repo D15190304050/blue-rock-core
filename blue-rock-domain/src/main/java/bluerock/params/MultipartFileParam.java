@@ -15,10 +15,10 @@ import javax.validation.constraints.NotNull;
 @NotNull
 public class MultipartFileParam
 {
-    @Min(value = 1, message = "User ID must be a positive integer.")
+    @Min(value = 1, message = ValidationMessages.USER_ID_POSITIVE)
     private long userId;
 
-    private Long parentDirectoryId;
+    private long parentDirectoryId;
 
     @NotNull
     private MultipartFile file;

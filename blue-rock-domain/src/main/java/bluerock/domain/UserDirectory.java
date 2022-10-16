@@ -1,12 +1,19 @@
 package bluerock.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class UserDirectory
 {
     private long id;
 
-    private Long parentId;
+    private long parentId;
 
     private long userId;
 
@@ -19,84 +26,4 @@ public class UserDirectory
     private Date updateTime;
 
     private int inTrash;
-
-    public long getId()
-    {
-        return id;
-    }
-
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
-    public Long getParentId()
-    {
-        return parentId;
-    }
-
-    public void setParentId(Long parentId)
-    {
-        this.parentId = parentId;
-    }
-
-    public long getUserId()
-    {
-        return userId;
-    }
-
-    public void setUserId(long userId)
-    {
-        this.userId = userId;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name == null ? null : name.trim();
-    }
-
-    public String getPath()
-    {
-        return path;
-    }
-
-    public void setPath(String path)
-    {
-        this.path = path == null ? null : path.trim();
-    }
-
-    public Date getCreationTime()
-    {
-        return creationTime;
-    }
-
-    public void setCreationTime(Date creationTime)
-    {
-        this.creationTime = creationTime;
-    }
-
-    public Date getUpdateTime()
-    {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime)
-    {
-        this.updateTime = updateTime;
-    }
-
-    public int getInTrash()
-    {
-        return inTrash;
-    }
-
-    public void setInTrash(int inTrash)
-    {
-        this.inTrash = inTrash;
-    }
 }

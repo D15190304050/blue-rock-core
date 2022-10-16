@@ -79,16 +79,11 @@ public class UserUserDirectoryService implements IUserDirectoryService
         if (directoryCount > 0)
             return new ServiceResponse<>(-2, false, false, "Directory exists", null);
 
-        Long parentDirectoryId = createParam.getParentDirectoryId();
+        long parentDirectoryId = createParam.getParentDirectoryId();
         String directoryPathSuffix = createParam.getName() + "/";
         String path;
-        if (parentDirectoryId == null)
-            path = directoryPathSuffix;
-        else
-        {
-            UserDirectory parentDirectory = userDirectoryMapper.getDirectoryById(parentDirectoryId);
-            path = parentDirectory.getPath() + directoryPathSuffix;
-        }
+        UserDirectory parentDirectory = userDirectoryMapper.getDirectoryById(parentDirectoryId);
+        path = parentDirectory.getPath() + directoryPathSuffix;
 
         UserDirectory directoryToInsert = new UserDirectory();
         directoryToInsert.setParentId(parentDirectoryId);
@@ -115,12 +110,9 @@ public class UserUserDirectoryService implements IUserDirectoryService
     }
 
     @Override
-    public String getDirectoryPathById(Long id)
+    public String getDirectoryPathById(long id)
     {
-        if (id == null)
-            return "";
-        else
-            return userDirectoryMapper.getDirectoryById(id).getPath();
+        return userDirectoryMapper.getDirectoryById(id).getPath();
     }
 
     @Override

@@ -17,7 +17,7 @@ public interface IUserDirectoryService
     ServiceResponse<List<StorageObject>> showContentsInDirectory(ShowDirectoryAndFileParam showParam);
     ServiceResponse<Boolean> createDirectory(CreateDirectoryParam createParam);
     ServiceResponse<Boolean> renameDirectory(@Validated RenameParam renameParam);
-    String getDirectoryPathById(Long id);
+    String getDirectoryPathById(long id);
     ServiceResponse<Boolean> canDelete(DeleteParam deleteParam);
     List<Long> getAllChildrenIds(long id);
     ServiceResponse<Boolean> deleteDirectory(DeleteParam deleteParam);

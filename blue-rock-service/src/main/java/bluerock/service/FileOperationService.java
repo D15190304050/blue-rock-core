@@ -74,7 +74,7 @@ public class FileOperationService implements IFileOperationService
     public ServiceResponse<String> uploadFile(@Validated MultipartFileParam multipartFileParam)
     {
         MultipartFile file = multipartFileParam.getFile();
-        Long parentDirectoryId = multipartFileParam.getParentDirectoryId();
+        long parentDirectoryId = multipartFileParam.getParentDirectoryId();
         long userId = multipartFileParam.getUserId();
 
         String fileName = file.getName();

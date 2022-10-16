@@ -21,7 +21,7 @@ public class FileMetadata
 
     private String url;
 
-    private Long directoryId;
+    private long directoryId;
 
     private long userId;
 

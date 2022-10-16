@@ -20,4 +20,5 @@ public interface UserDirectoryMapper
     int updateNameById(RenameParam renameParam);
     String findChildrenDirectoryIds(long rootDirectoryId);
     int deleteDirectoriesByIdsAndUserId(@Param("userId") long userId, @Param("ids") List<Long> ids);
+    Long getRootDirectoryIdByUserId(long userId);
 }

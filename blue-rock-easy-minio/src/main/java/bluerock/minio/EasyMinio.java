@@ -35,6 +35,14 @@ public class EasyMinio
         return minioClient;
     }
 
+    public void createBucket(String bucketName) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException
+    {
+        if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build()))
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+
+        log.info("Bucket \"" + bucketName + "\" is created successfully.");
+    }
+
     public String getObjectUrl(String bucketName, String objectName) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException
     {
         String objectUrl = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()

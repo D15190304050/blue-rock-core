@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @NotNull
 public class CreateDirectoryParam
 {
-    @Min(value = 1, message = "User ID must be a positive integer.")
+    @Min(value = 1, message = ValidationMessages.USER_ID_POSITIVE)
     private long userId;
 
     /**
@@ -23,5 +23,5 @@ public class CreateDirectoryParam
     @NotBlank(message = ValidationMessages.NAME_NOT_EMPTY)
     private String name;
 
-    private Long parentDirectoryId;
+    private long parentDirectoryId;
 }

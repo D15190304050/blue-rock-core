@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.Min;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -21,6 +22,7 @@ public class ShowDirectoryAndFileParam
     /**
      * ID of the user.
      */
+    @Min(value = 1, message = ValidationMessages.USER_ID_POSITIVE)
     private long userId;
 
     /**
@@ -31,7 +33,7 @@ public class ShowDirectoryAndFileParam
     /**
      * ID of the parent directory.
      */
-    private Long parentDirectoryId;
+    private long parentDirectoryId;
 
     /**
      * Key of the sort field.

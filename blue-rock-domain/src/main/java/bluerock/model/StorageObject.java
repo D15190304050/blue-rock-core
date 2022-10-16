@@ -19,7 +19,7 @@ public class StorageObject
 
     private int storageTypeId;
     private long userId;
-    private Long parentDirectoryId;
+    private long parentDirectoryId;
     private String name;
     private Date updateTime;
     private int inTrash;

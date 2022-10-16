@@ -87,4 +87,11 @@
                 #{item}
             </foreach>
     </delete>
+
+    <select id="getRootDirectoryIdByUserId" resultType="Long">
+        SELECT id
+        FROM user_directory
+        WHERE user_id = #{userId}
+          AND parent_id = 0
+    </select>
 </mapper>

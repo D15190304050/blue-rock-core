@@ -9,6 +9,7 @@ import bluerock.params.ShowDirectoryAndFileParam;
 import dataworks.params.ArgumentValidator;
 import dataworks.web.commons.ServiceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class FileMetadataService implements IFileMetadataService
     @Autowired
     private FileMetadataMapper fileMetadataMapper;
 
+    @Lazy
     @Autowired
     private UserUserDirectoryService userDirectoryService;
 
@@ -42,7 +44,7 @@ public class FileMetadataService implements IFileMetadataService
     public String getFilePathByFileId(long id)
     {
         FileMetadata fileMetadata = fileMetadataMapper.getFileMetadataById(id);
-        Long directoryId = fileMetadata.getDirectoryId();
+        long directoryId = fileMetadata.getDirectoryId();
 
         String fileName = fileMetadata.getFileName();
 
@@ -51,7 +53,7 @@ public class FileMetadataService implements IFileMetadataService
     }
 
     @Override
-    public String generateUserFilePath(long userId, Long parentDirectoryId, String fileName)
+    public String generateUserFilePath(long userId, long parentDirectoryId, String fileName)
     {
         String directoryPath = userDirectoryService.getDirectoryPathById(parentDirectoryId);
         return userId + "-" + directoryPath + fileName;
