@@ -64,4 +64,11 @@ public class FileMetadataService implements IFileMetadataService
     {
         return fileMetadataMapper.getFilesInDirectories(userId, directoryIds);
     }
+
+    @Override
+    public ServiceResponse<FileMetadata> getFileMetadataById(long id)
+    {
+        FileMetadata fileMetadata = fileMetadataMapper.getFileMetadataById(id);
+        return ServiceResponse.buildSuccessResponse(fileMetadata);
+    }
 }

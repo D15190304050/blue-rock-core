@@ -9,7 +9,7 @@ import dataworks.ExceptionInfoFormatter;
 import dataworks.params.ArgumentValidator;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Objects;
 
 // TODO: Check if uploadingTask sync with the record in database.
 
@@ -51,6 +50,8 @@ public class FileUploadingMonitor
     private byte[] partBuffer;
     private FileUploadingTask fileUploadingTask;
 
+    private ValueOperations<String, String> valueOperations;
+
 
     /**
      * Call this method only when creating a new file uploading task.
@@ -61,19 +62,21 @@ public class FileUploadingMonitor
      * @throws FileNotFoundException
      */
     public FileUploadingMonitor(EasyMinio easyMinio,
+                                ValueOperations<String, String> valueOperations,
                                 FileMetadata fileMetadata,
                                 IProgressListener progressListener,
                                 FilePartMapper filePartMapper,
                                 FileUploadingTaskMapper fileUploadingTaskMapper)
             throws IOException
     {
-        initializeFields(easyMinio, fileMetadata, progressListener, filePartMapper, fileUploadingTaskMapper);
+        initializeFields(easyMinio, valueOperations, fileMetadata, progressListener, filePartMapper, fileUploadingTaskMapper);
 
         // taskId will be initialized in the initializeTask() method.
         initializeTask(fileMetadata);
     }
 
     public FileUploadingMonitor(EasyMinio easyMinio,
+                                ValueOperations<String, String> valueOperations,
                                 FileMetadata fileMetadata,
                                 IProgressListener progressListener,
                                 FilePartMapper filePartMapper,
@@ -81,11 +84,12 @@ public class FileUploadingMonitor
                                 long taskId)
             throws IOException
     {
-        initializeFields(easyMinio, fileMetadata, progressListener, filePartMapper, fileUploadingTaskMapper);
+        initializeFields(easyMinio, valueOperations, fileMetadata, progressListener, filePartMapper, fileUploadingTaskMapper);
         initializeTask(taskId);
     }
 
     private void initializeFields(EasyMinio easyMinio,
+                                  ValueOperations<String, String> valueOperations,
                                   FileMetadata fileMetadata,
                                   IProgressListener progressListener,
                                   FilePartMapper filePartMapper,
@@ -105,6 +109,7 @@ public class FileUploadingMonitor
 
         //region Member initialization.
         this.easyMinio = easyMinio;
+        this.valueOperations = valueOperations;
         this.bucketName = fileMetadata.getBucketName();
         this.objectName = fileMetadata.getObjectName();
         this.fileName = fileMetadata.getFileName();
@@ -163,13 +168,30 @@ public class FileUploadingMonitor
         return inputStream;
     }
 
+    public String getTaskKey()
+    {
+        return "fileUploadingTask_" + fileUploadingTask.getId();
+    }
+
+    private FileUploadingTaskState getTaskState()
+    {
+        String currentStateCodeString = valueOperations.get(getTaskKey());
+        int currentStateCode = Integer.parseInt(currentStateCodeString);
+        FileUploadingTaskState currentState = FileUploadingTaskState.getStateByCode(currentStateCode);
+
+        if (currentStateCode != fileUploadingTask.getState())
+            setTaskState(currentState);
+
+        return currentState;
+    }
+
     public void run(MultipartFile file) throws IOException, InterruptedException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException
     {
         setInputStreamForUploading(file);
 
         fileUploadingTask.setState(FileUploadingTaskState.UPLOADING.getCode());
 
-        while (fileUploadingTask.getState() == FileUploadingTaskState.UPLOADING.getCode())
+        while (getTaskState() == FileUploadingTaskState.UPLOADING)
         {
             byte[] nextBatch = new byte[BYTE_BUFFER_SIZE];
             int readLength = progressInputStream.read(nextBatch, this.bufferSize, BYTE_BUFFER_SIZE);
@@ -199,8 +221,17 @@ public class FileUploadingMonitor
                     uploadNextPart();
             }
 
-            Thread.sleep(1);
+//            Thread.sleep(1);
         }
+
+        if (getTaskState() == FileUploadingTaskState.PAUSED)
+        {
+            // Upload bytes in partBuffer.
+            flushPartBuffer();
+        }
+
+        // Release unused resources.
+        progressInputStream.close();
     }
 
     public Thread start(MultipartFile file)
@@ -229,28 +260,6 @@ public class FileUploadingMonitor
         fileUploadingTask.setState(FileUploadingTaskState.UPLOADING.getCode());
 
         return start(file);
-    }
-
-    public void pause() throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException
-    {
-        // TODO: Finish this function.
-        setTaskState(FileUploadingTaskState.PAUSED);
-
-        // Upload bytes in partBuffer.
-        flushPartBuffer();
-
-        // Release unused resources.
-        progressInputStream.close();
-    }
-
-    public void abort() throws IOException
-    {
-        setTaskState(FileUploadingTaskState.ABORTED);
-
-        // Release unused resources.
-        progressInputStream.close();
-
-        // Since the task is aborted, we don't need to call the flushPartBuffer() method here.
     }
 
     public int getRemainingFileSize() throws IOException

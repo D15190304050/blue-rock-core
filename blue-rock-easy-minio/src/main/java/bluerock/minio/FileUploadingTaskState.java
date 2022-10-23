@@ -11,7 +11,7 @@ public enum FileUploadingTaskState
     ABORTED(6)
     ;
 
-    private int code;
+    private final int code;
 
     FileUploadingTaskState(int code)
     {

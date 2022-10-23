@@ -21,6 +21,7 @@ import dataworks.web.commons.ServiceResponse;
 import io.minio.errors.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -54,6 +55,9 @@ public class FileOperationService implements IFileOperationService
 
     @Autowired
     private FileMetadataService fileMetadataService;
+
+    @Autowired
+    private ValueOperations<String, String> valueOperations;
 
     /**
      * Call this method before executing real uploading operation.
@@ -106,7 +110,7 @@ public class FileOperationService implements IFileOperationService
 
         try
         {
-            FileUploadingMonitor fileUploadingMonitor = new FileUploadingMonitor(easyMinio, fileMetadata, progressListener, filePartMapper, fileUploadingTaskMapper);
+            FileUploadingMonitor fileUploadingMonitor = new FileUploadingMonitor(easyMinio, valueOperations, fileMetadata, progressListener, filePartMapper, fileUploadingTaskMapper);
             Thread fileUploadingThread = fileUploadingMonitor.start(file);
             FileUploadingTask fileUploadingTask = fileUploadingMonitor.getFileUploadingTask();
         }
