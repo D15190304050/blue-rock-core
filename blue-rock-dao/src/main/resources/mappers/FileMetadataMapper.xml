@@ -48,7 +48,7 @@
           AND directory_id = #{parentDirectoryId}
     </select>
 
-    <select id="getFileMetadataById" resultMap="BaseResultMap">
+    <select id="getFileMetadataByIdAndUserId" resultMap="BaseResultMap">
         SELECT id,
                bucket_name,
                object_name,
@@ -60,6 +60,7 @@
                update_time
         FROM file_metadata
         WHERE id = #{id}
+          AND user_id = #{userId}
     </select>
 
     <insert id="insertNew">
@@ -99,5 +100,21 @@
             </foreach>
     </delete>
 
+    <select id="countFileByIdAndUserId" resultType="int">
+        SELECT COUNT(*) FROM file_metadata WHERE id = #{id} AND user_id = #{userId}
+    </select>
 
+    <update id="updateNameById">
+        UPDATE file_metadata SET file_name = #{name} WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <select id="getFileIdsNotBelongToUser" resultType="long">
+        SELECT id
+        FROM file_metadata
+        WHERE user_id != #{userId}
+          AND id IN
+              <foreach collection="fileIds" open="(" close=")" item="fileId" separator=",">
+                  #{fileId}
+              </foreach>
+    </select>
 </mapper>

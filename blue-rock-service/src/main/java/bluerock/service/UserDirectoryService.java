@@ -1,6 +1,6 @@
 package bluerock.service;
 
-import bluerock.api.IFileOperationService;
+import bluerock.api.IFileIOService;
 import bluerock.api.IUserDirectoryService;
 import bluerock.api.IFileMetadataService;
 import bluerock.dao.UserDirectoryMapper;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserUserDirectoryService implements IUserDirectoryService
+public class UserDirectoryService implements IUserDirectoryService
 {
     @Autowired
     private UserDirectoryMapper userDirectoryMapper;
@@ -31,7 +31,7 @@ public class UserUserDirectoryService implements IUserDirectoryService
     private IFileMetadataService fileMetadataService;
 
     @Autowired
-    private IFileOperationService fileOperationService;
+    private IFileIOService fileIOService;
 
     @Override
     public ServiceResponse<List<UserDirectory>> showDirectories(ShowDirectoryAndFileParam showParam)
@@ -154,7 +154,7 @@ public class UserUserDirectoryService implements IUserDirectoryService
         List<Long> childrenDirectoryIds = getAllChildrenIds(deleteParam.getId());
 
         List<FileMetadata> fileMetadataList = fileMetadataService.getFileIdsInDirectoryIds(userId, childrenDirectoryIds);
-        boolean deletionResult = fileOperationService.deleteFiles(fileMetadataList);
+        boolean deletionResult = fileIOService.deleteFiles(fileMetadataList);
 
         int directoryDeletionCount = userDirectoryMapper.deleteDirectoriesByIdsAndUserId(userId, childrenDirectoryIds);
 

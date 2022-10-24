@@ -1,6 +1,6 @@
 package bluerock.service;
 
-import bluerock.api.IFileOperationService;
+import bluerock.api.IFileIOService;
 import bluerock.dao.FileMetadataMapper;
 import bluerock.dao.FilePartMapper;
 import bluerock.dao.FileUploadingTaskMapper;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @LogArgumentsAndResponse
-public class FileOperationService implements IFileOperationService
+public class FileIOService implements IFileIOService
 {
     @Autowired
     private EasyMinio easyMinio;
