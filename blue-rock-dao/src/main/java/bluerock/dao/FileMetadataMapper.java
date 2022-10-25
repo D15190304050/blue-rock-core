@@ -21,4 +21,6 @@ public interface FileMetadataMapper
     int countFileByIdAndUserId(@Param("id") long id, @Param("userId") long userId);
     int updateNameById(RenameParam renameParam);
     List<Long> getFileIdsNotBelongToUser(@Param("userId") long userId, @Param("fileIds") List<Long> fileIds);
+    List<Long> getFileIdsNotInDirectory(@Param("directoryId") long directoryId, @Param("fileIds") List<Long> fileIds);
+    int batchSetDirectoryId(@Param("directoryId") long directoryId, @Param("fileIds") List<Long> fileIds);
 }

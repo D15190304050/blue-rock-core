@@ -117,4 +117,23 @@
                   #{fileId}
               </foreach>
     </select>
+
+    <select id="getFileIdsNotInDirectory" resultType="long">
+        SELECT id
+        FROM file_metadata
+        WHERE directory_id = #{directoryId}
+          AND id IN
+              <foreach collection="fileIds" open="(" close=")" item="fileId" separator=",">
+                  #{fileId}
+              </foreach>
+    </select>
+
+    <update id="batchSetDirectoryId">
+        UPDATE file_metadata
+        SET directory_id = #{directoryId}
+        WHERE id IN
+            <foreach collection="fileIds" open="(" close=")" item="fileId" separator=",">
+                #{fileId}
+            </foreach>
+    </update>
 </mapper>
