@@ -12,4 +12,4 @@ CREATE TABLE file_chunk
     ENGINE = INNODB
     DEFAULT CHARSET = utf8mb4
     COLLATE utf8mb4_bin
-    COMMENT 'File chunk of a file uploading task.';
+    COMMENT 'File chunk of a file uploading task.'
