@@ -1,6 +1,7 @@
 package bluerock.api;
 
 import bluerock.domain.FileMetadata;
+import bluerock.params.DeleteFilesParam;
 import bluerock.params.MoveFilesParam;
 import bluerock.params.RenameParam;
 import bluerock.params.ShowDirectoryAndFileParam;
@@ -18,4 +19,5 @@ public interface IFileMetadataService
     ServiceResponse<FileMetadata> getFileMetadataById(long userId, long id);
     ServiceResponse<Boolean> renameFile(RenameParam renameParam);
     ServiceResponse<Boolean> moveFiles(MoveFilesParam moveFilesParam);
+    ServiceResponse<Boolean> deleteFiles(DeleteFilesParam deleteFilesParam);
 }

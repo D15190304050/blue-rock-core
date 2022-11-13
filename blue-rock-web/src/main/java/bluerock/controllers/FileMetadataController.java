@@ -2,6 +2,7 @@ package bluerock.controllers;
 
 import bluerock.api.IFileMetadataService;
 import bluerock.domain.FileMetadata;
+import bluerock.params.DeleteFilesParam;
 import bluerock.params.MoveFilesParam;
 import bluerock.params.RenameParam;
 import bluerock.params.ShowDirectoryAndFileParam;
@@ -42,5 +43,11 @@ public class FileMetadataController
     public ServiceResponse<Boolean> moveFiles(@RequestBody MoveFilesParam moveFilesParam)
     {
         return fileMetadataService.moveFiles(moveFilesParam);
+    }
+
+    @PostMapping("/delete")
+    public ServiceResponse<Boolean> deleteFiles(@RequestBody DeleteFilesParam deleteFilesParam)
+    {
+        return fileMetadataService.deleteFiles(deleteFilesParam);
     }
 }

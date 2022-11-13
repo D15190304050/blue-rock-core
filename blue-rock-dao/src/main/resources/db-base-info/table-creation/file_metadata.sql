@@ -8,7 +8,7 @@ CREATE TABLE `file_metadata`
     `url`          VARCHAR(300) CHARSET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'Access URL of the file.',
     `directory_id` BIGINT                                           NOT NULL COMMENT 'ID of the directory that directly contains the file.',
     `user_id`      BIGINT                                           NOT NULL COMMENT 'ID of the user who possesses the file.',
-    `in_trash`     INT                                              NOT NULL DEFAULT 0 COMMENT 'Is this file in trash: 0 - no; 1 - yes.',
+    `in_trash`     INT                                              NOT NULL DEFAULT 0 COMMENT 'Is this file in trash: 0 - in the user\'s space; 1 - in the user\'s trash; 2 - should be deleted, but not deleted in MinIO yet.',
     PRIMARY KEY (`id`),
     KEY `idx_directory_id` (`directory_id`),
     KEY `idx_user_id` (`user_id`)

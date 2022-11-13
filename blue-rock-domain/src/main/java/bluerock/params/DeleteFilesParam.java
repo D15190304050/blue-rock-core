@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class MoveFilesParam implements IUserFileSourceDirectoryId
+public class DeleteFilesParam implements IUserFileSourceDirectoryId
 {
     @Min(value = 1, message = ValidationMessages.USER_ID_POSITIVE)
     private long userId;
@@ -21,7 +21,4 @@ public class MoveFilesParam implements IUserFileSourceDirectoryId
 
     @Min(value = 1, message = ValidationMessages.FILE_DIRECTORY_ID_POSITIVE)
     private long sourceDirectoryId;
-
-    @Min(value = 1, message = ValidationMessages.FILE_DIRECTORY_ID_POSITIVE)
-    private long destinationDirectoryId;
 }

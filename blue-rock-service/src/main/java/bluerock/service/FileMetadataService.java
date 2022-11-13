@@ -5,10 +5,9 @@ import bluerock.api.IUserDirectoryService;
 import bluerock.dao.FileMetadataMapper;
 import bluerock.dao.UserDirectoryMapper;
 import bluerock.domain.FileMetadata;
-import bluerock.params.MoveFilesParam;
-import bluerock.params.RenameParam;
-import bluerock.params.ShowDirectoryAndFileParam;
+import bluerock.params.*;
 import dataworks.params.ArgumentValidator;
+import dataworks.params.ValidationChain;
 import dataworks.web.commons.ServiceResponse;
 import dataworks.web.commons.authorization.AuthorizationErrorMessageGenerator;
 import dataworks.web.commons.authorization.CommonResourceTypes;
@@ -97,6 +96,59 @@ public class FileMetadataService implements IFileMetadataService
             return new ServiceResponse<>(-3, false, false, "File does not exists", null);
     }
 
+    public String validateSourceDestinationDirectoryIds(MoveFilesParam param)
+    {
+        if (param.getSourceDirectoryId() == param.getDestinationDirectoryId())
+            return "Source directory and destination directory must be different.";
+        else
+            return null;
+    }
+
+    private <T extends IUserFileSourceDirectoryId> String validateUserFiles(T param)
+    {
+        long userId = param.getUserId();
+        List<Long> fileIds = param.getFileIds();
+        List<Long> fileIdsNotBelongToUser = fileMetadataMapper.getFileIdsNotBelongToUser(userId, fileIds);
+        if (!CollectionUtils.isEmpty(fileIdsNotBelongToUser))
+            return AuthorizationErrorMessageGenerator.resourceNotPermitted(userId, fileIds, CommonResourceTypes.FILE);
+        else
+            return null;
+    }
+
+    private <T extends IUserFileSourceDirectoryId> String validateSourceDirectoryBelongsToUser(T param)
+    {
+        long userId = param.getUserId();
+        long sourceDirectoryId = param.getSourceDirectoryId();
+
+        int sourceDirectoryCount = userDirectoryMapper.countDirectoryByIdAndUserId(sourceDirectoryId, userId);
+        if (sourceDirectoryCount == 0)
+            return AuthorizationErrorMessageGenerator.resourceNotPermitted(userId, List.of(sourceDirectoryId), CommonResourceTypes.DIRECTORY);
+        else
+            return null;
+    }
+
+    private String validateDestinationDirectoryBelongsToUser(MoveFilesParam param)
+    {
+        long userId = param.getUserId();
+        long destinationDirectoryId = param.getDestinationDirectoryId();
+
+        int sourceDirectoryCount = userDirectoryMapper.countDirectoryByIdAndUserId(destinationDirectoryId, userId);
+        if (sourceDirectoryCount == 0)
+            return AuthorizationErrorMessageGenerator.resourceNotPermitted(userId, List.of(destinationDirectoryId), CommonResourceTypes.DIRECTORY);
+        else
+            return null;
+    }
+
+    private <T extends IUserFileSourceDirectoryId> String validateFilesInSameDirectory(T param)
+    {
+        long sourceDirectoryId = param.getSourceDirectoryId();
+        List<Long> fileIdsNotInSourceDirectory = fileMetadataMapper.getFileIdsNotInDirectory(sourceDirectoryId, param.getFileIds());
+        if (!CollectionUtils.isEmpty(fileIdsNotInSourceDirectory))
+            return String.format("Files with ID (%s) is (are) not in the directory (with ID: %d)", StringUtils.collectionToCommaDelimitedString(fileIdsNotInSourceDirectory), sourceDirectoryId);
+        else
+            return null;
+    }
+
     @Override
     @Transactional
     public ServiceResponse<Boolean> moveFiles(@Validated MoveFilesParam moveFilesParam)
@@ -109,34 +161,29 @@ public class FileMetadataService implements IFileMetadataService
         // 5. Validate if all these files are in the same directory, whose ID matches moveFilesParam.sourceDirectoryId.
         // 6. Set directoryId to destinationDirectoryId for all the files.
 
-        long userId = moveFilesParam.getUserId();
         List<Long> fileIds = moveFilesParam.getFileIds();
-        long sourceDirectoryId = moveFilesParam.getSourceDirectoryId();
         long destinationDirectoryId = moveFilesParam.getDestinationDirectoryId();
 
+        ValidationChain<MoveFilesParam> validationChain = new ValidationChain<>(moveFilesParam);
+
         // Step 1.
-        if (sourceDirectoryId == destinationDirectoryId)
-            return ServiceResponse.buildErrorResponse(-12, "Source directory and destination directory must be different.");
+        validationChain.addValidator(this::validateSourceDestinationDirectoryIds);
 
         // Step 2.
-        List<Long> fileIdsNotBelongToUser = fileMetadataMapper.getFileIdsNotBelongToUser(userId, fileIds);
-        if (!CollectionUtils.isEmpty(fileIdsNotBelongToUser))
-            return ServiceResponse.buildErrorResponse(-8, AuthorizationErrorMessageGenerator.resourceNotPermitted(userId, fileIds, CommonResourceTypes.FILE));
+        validationChain.addValidator(this::validateUserFiles);
 
         // Step 3.
-        int sourceDirectoryCount = userDirectoryMapper.countDirectoryByIdAndUserId(sourceDirectoryId, userId);
-        if (sourceDirectoryCount == 0)
-            return ServiceResponse.buildErrorResponse(-9, AuthorizationErrorMessageGenerator.resourceNotPermitted(userId, List.of(sourceDirectoryId), CommonResourceTypes.DIRECTORY));
+        validationChain.addValidator(this::validateSourceDirectoryBelongsToUser);
 
         // Step 4.
-        int destinationDirectoryCount = userDirectoryMapper.countDirectoryByIdAndUserId(destinationDirectoryId, userId);
-        if (destinationDirectoryCount == 0)
-            return ServiceResponse.buildErrorResponse(-9, AuthorizationErrorMessageGenerator.resourceNotPermitted(userId, List.of(destinationDirectoryId), CommonResourceTypes.DIRECTORY));
+        validationChain.addValidator(this::validateDestinationDirectoryBelongsToUser);
 
         // Step 5.
-        List<Long> fileIdsNotInSourceDirectory = fileMetadataMapper.getFileIdsNotInDirectory(sourceDirectoryId, fileIds);
-        if (!CollectionUtils.isEmpty(fileIdsNotInSourceDirectory))
-            return ServiceResponse.buildErrorResponse(-10, String.format("Files with ID (%s) is (are) not in the directory (with ID: %d)", StringUtils.collectionToCommaDelimitedString(fileIdsNotInSourceDirectory), sourceDirectoryId));
+        validationChain.addValidator(this::validateFilesInSameDirectory);
+
+        String errorMessage = validationChain.validate();
+        if (errorMessage != null)
+            return ServiceResponse.buildErrorResponse(-7, errorMessage);
 
         // Step 6.
         int updateCount = fileMetadataMapper.batchSetDirectoryId(destinationDirectoryId, fileIds);
@@ -145,5 +192,29 @@ public class FileMetadataService implements IFileMetadataService
             return ServiceResponse.buildSuccessResponse(true);
         else
             return ServiceResponse.buildErrorResponse(-11, "Internal error, see logs for more information.");
+    }
+
+    @Override
+    @Transactional
+    public ServiceResponse<Boolean> deleteFiles(@Validated DeleteFilesParam deleteFilesParam)
+    {
+        // Steps:
+        // 1. Validate userId-fileId pairs, report resource authorization exception if there is any userId-fileId not match.
+        // 2. Validate if the source directory (with ID = sourceDirectoryId) belongs to the user, report resource authorization exception if not.
+        // 3. Validate if all these files are in the same directory, whose ID matches moveFilesParam.sourceDirectoryId.
+        // 4. Delete them all from both database and MinIO.
+
+        ValidationChain<DeleteFilesParam> validationChain = new ValidationChain<>(deleteFilesParam);
+        validationChain.addValidator(this::validateUserFiles);
+        validationChain.addValidator(this::validateSourceDirectoryBelongsToUser);
+        validationChain.addValidator(this::validateFilesInSameDirectory);
+
+        String errorMessage = validationChain.validate();
+        if (errorMessage != null)
+            return ServiceResponse.buildErrorResponse(-7, errorMessage);
+
+        // TODO: Delete files.
+
+        return null;
     }
 }

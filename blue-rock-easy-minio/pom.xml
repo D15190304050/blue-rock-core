@@ -12,6 +12,18 @@
     <artifactId>blue-rock-easy-minio</artifactId>
 
     <name>blue-rock-easy-minio</name>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>16</source>
+                    <target>16</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <properties>
         <minio.version>8.4.3</minio.version>
