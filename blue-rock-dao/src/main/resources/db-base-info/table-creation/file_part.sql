@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `file_part`;
-CREATE TABLE `file_part`
+DROP TABLE IF EXISTS file_chunk;
+CREATE TABLE file_chunk
 (
     `id`             BIGINT                                           NOT NULL AUTO_INCREMENT COMMENT 'ID.',
     `task_id`        BIGINT                                           NOT NULL COMMENT 'ID of the file uploading progress.',
@@ -12,4 +12,4 @@ CREATE TABLE `file_part`
     ENGINE = INNODB
     DEFAULT CHARSET = utf8mb4
     COLLATE utf8mb4_bin
-    COMMENT 'File parts of a file uploading task.';
+    COMMENT 'File chunk of a file uploading task.';
