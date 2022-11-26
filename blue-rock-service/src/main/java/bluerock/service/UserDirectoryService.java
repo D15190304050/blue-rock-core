@@ -24,7 +24,6 @@ import java.util.List;
 @Service
 public class UserDirectoryService implements IUserDirectoryService
 {
-    // Comment
     @Autowired
     private UserDirectoryMapper userDirectoryMapper;
 
