@@ -1,9 +1,9 @@
 package bluerock.minio;
 
-import bluerock.dao.FilePartMapper;
+import bluerock.dao.FileChunkMapper;
 import bluerock.dao.FileUploadingTaskMapper;
 import bluerock.domain.FileMetadata;
-import bluerock.domain.FilePart;
+import bluerock.domain.FileChunk;
 import bluerock.domain.FileUploadingTask;
 import dataworks.ExceptionInfoFormatter;
 import dataworks.params.ArgumentValidator;
@@ -43,7 +43,7 @@ public class FileUploadingMonitor
     private IProgressListener progressListener;
     private EasyMinio easyMinio;
     private String bucketName;
-    private FilePartMapper filePartMapper;
+    private FileChunkMapper fileChunkMapper;
     private FileUploadingTaskMapper fileUploadingTaskMapper;
 
     private int bufferSize;
@@ -57,7 +57,7 @@ public class FileUploadingMonitor
      * Call this method only when creating a new file uploading task.
      * @param easyMinio
      * @param progressListener
-     * @param filePartMapper
+     * @param fileChunkMapper
      * @param fileUploadingTaskMapper
      * @throws FileNotFoundException
      */
@@ -65,11 +65,11 @@ public class FileUploadingMonitor
                                 ValueOperations<String, String> valueOperations,
                                 FileMetadata fileMetadata,
                                 IProgressListener progressListener,
-                                FilePartMapper filePartMapper,
+                                FileChunkMapper fileChunkMapper,
                                 FileUploadingTaskMapper fileUploadingTaskMapper)
             throws IOException
     {
-        initializeFields(easyMinio, valueOperations, fileMetadata, progressListener, filePartMapper, fileUploadingTaskMapper);
+        initializeFields(easyMinio, valueOperations, fileMetadata, progressListener, fileChunkMapper, fileUploadingTaskMapper);
 
         // taskId will be initialized in the initializeTask() method.
         initializeTask(fileMetadata);
@@ -79,12 +79,12 @@ public class FileUploadingMonitor
                                 ValueOperations<String, String> valueOperations,
                                 FileMetadata fileMetadata,
                                 IProgressListener progressListener,
-                                FilePartMapper filePartMapper,
+                                FileChunkMapper fileChunkMapper,
                                 FileUploadingTaskMapper fileUploadingTaskMapper,
                                 long taskId)
             throws IOException
     {
-        initializeFields(easyMinio, valueOperations, fileMetadata, progressListener, filePartMapper, fileUploadingTaskMapper);
+        initializeFields(easyMinio, valueOperations, fileMetadata, progressListener, fileChunkMapper, fileUploadingTaskMapper);
         initializeTask(taskId);
     }
 
@@ -92,14 +92,14 @@ public class FileUploadingMonitor
                                   ValueOperations<String, String> valueOperations,
                                   FileMetadata fileMetadata,
                                   IProgressListener progressListener,
-                                  FilePartMapper filePartMapper,
+                                  FileChunkMapper fileChunkMapper,
                                   FileUploadingTaskMapper fileUploadingTaskMapper)
             throws IOException
     {
         //region Non-null validation.
         ArgumentValidator.requireNonNull(easyMinio, "easyMinio");
         ArgumentValidator.requireNonNull(progressListener, "progressListener");
-        ArgumentValidator.requireNonNull(filePartMapper, "filePartMapper");
+        ArgumentValidator.requireNonNull(fileChunkMapper, "filePartMapper");
         ArgumentValidator.requireNonNull(fileUploadingTaskMapper, "fileUploadingTaskMapper");
         ArgumentValidator.requireNonNull(fileMetadata, "fileMetadata");
         //endregion
@@ -114,7 +114,7 @@ public class FileUploadingMonitor
         this.objectName = fileMetadata.getObjectName();
         this.fileName = fileMetadata.getFileName();
         this.progressListener = progressListener;
-        this.filePartMapper = filePartMapper;
+        this.fileChunkMapper = fileChunkMapper;
         this.fileUploadingTaskMapper = fileUploadingTaskMapper;
         this.partBuffer = new byte[MAX_BUFFER_SIZE];
         this.bufferSize = 0;
@@ -287,17 +287,17 @@ public class FileUploadingMonitor
 
     private void initializeFilePart(String objectName, long byteCount)
     {
-        FilePart filePart = new FilePart();
-        filePart.setByteCount(byteCount);
-        filePart.setObjectName(objectName);
-        filePart.setTaskId(fileUploadingTask.getId());
-        filePartMapper.insert(filePart);
+        FileChunk fileChunk = new FileChunk();
+        fileChunk.setByteCount(byteCount);
+        fileChunk.setObjectName(objectName);
+        fileChunk.setTaskId(fileUploadingTask.getId());
+        fileChunkMapper.insert(fileChunk);
 //        return filePart;
     }
 
     private String generateNextPartName()
     {
-        return objectName + "_part_" + filePartMapper.countFilePartsByTaskId(fileUploadingTask.getId());
+        return objectName + "_part_" + fileChunkMapper.countFilePartsByTaskId(fileUploadingTask.getId());
     }
 
     private void updateTaskUpdatedBytes()
@@ -351,7 +351,7 @@ public class FileUploadingMonitor
         // Compose object.
         // 1) Get names of objects to compose, from database.
         // 2) Compose them as a new object.
-        List<String> partNames = filePartMapper.getPartNamesByTaskId(fileUploadingTask.getId());
+        List<String> partNames = fileChunkMapper.getPartNamesByTaskId(fileUploadingTask.getId());
         easyMinio.composeObjects(bucketName, objectName, partNames);
     }
 }

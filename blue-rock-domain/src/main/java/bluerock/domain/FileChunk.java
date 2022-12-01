@@ -2,7 +2,7 @@ package bluerock.domain;
 
 import java.util.Date;
 
-public class FilePart
+public class FileChunk
 {
     private long id;
 

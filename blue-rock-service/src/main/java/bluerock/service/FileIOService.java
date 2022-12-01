@@ -2,7 +2,7 @@ package bluerock.service;
 
 import bluerock.api.IFileIOService;
 import bluerock.dao.FileMetadataMapper;
-import bluerock.dao.FilePartMapper;
+import bluerock.dao.FileChunkMapper;
 import bluerock.dao.FileUploadingTaskMapper;
 import bluerock.dao.UserFileMapper;
 import bluerock.domain.FileMetadata;
@@ -48,7 +48,7 @@ public class FileIOService implements IFileIOService
     private FileMetadataMapper fileMetadataMapper;
 
     @Autowired
-    private FilePartMapper filePartMapper;
+    private FileChunkMapper fileChunkMapper;
 
     @Autowired
     private FileUploadingTaskMapper fileUploadingTaskMapper;
@@ -110,7 +110,7 @@ public class FileIOService implements IFileIOService
 
         try
         {
-            FileUploadingMonitor fileUploadingMonitor = new FileUploadingMonitor(easyMinio, valueOperations, fileMetadata, progressListener, filePartMapper, fileUploadingTaskMapper);
+            FileUploadingMonitor fileUploadingMonitor = new FileUploadingMonitor(easyMinio, valueOperations, fileMetadata, progressListener, fileChunkMapper, fileUploadingTaskMapper);
             Thread fileUploadingThread = fileUploadingMonitor.start(file);
             FileUploadingTask fileUploadingTask = fileUploadingMonitor.getFileUploadingTask();
         }
