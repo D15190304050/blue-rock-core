@@ -22,7 +22,8 @@
         <module>blue-rock-domain</module>
         <module>blue-rock-service</module>
         <module>blue-rock-web</module>
-        <module>blue-rock-easy-minio</module>
+        <module>blue-rock-minio</module>
+        <module>blue-rock-minio</module>
     </modules>
 
     <name>blue-rock</name>
@@ -73,6 +74,12 @@
             <dependency>
                 <groupId>org.dataworks</groupId>
                 <artifactId>dataworks</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dataworks</groupId>
+                <artifactId>easy-minio</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
         </dependencies>
@@ -127,8 +134,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>16</source>
-                    <target>16</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
         </plugins>

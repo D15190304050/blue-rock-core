@@ -11,6 +11,7 @@ import bluerock.params.DeleteParam;
 import bluerock.params.CreateDirectoryParam;
 import bluerock.params.RenameParam;
 import bluerock.params.ShowDirectoryAndFileParam;
+import dataworks.autoconfig.web.LogArgumentsAndResponse;
 import dataworks.params.ArgumentValidator;
 import dataworks.web.commons.ServiceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@LogArgumentsAndResponse
+@Validated
 public class UserDirectoryService implements IUserDirectoryService
 {
     @Autowired
@@ -73,7 +77,7 @@ public class UserDirectoryService implements IUserDirectoryService
 
     @Override
     @Transactional
-    public ServiceResponse<Boolean> createDirectory(@Validated CreateDirectoryParam createParam)
+    public ServiceResponse<Boolean> createDirectory(@Valid CreateDirectoryParam createParam)
     {
         int directoryCount = userDirectoryMapper.countDirectoryByNameAndParent(createParam);
         if (directoryCount > 0)

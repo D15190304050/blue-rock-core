@@ -40,5 +40,6 @@
         SELECT object_name
         FROM file_chunk
         WHERE task_id = #{taskId}
+        ORDER BY id
     </select>
 </mapper>

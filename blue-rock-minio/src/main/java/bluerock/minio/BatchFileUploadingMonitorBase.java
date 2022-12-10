@@ -1,5 +1,6 @@
 package bluerock.minio;
 
+import dataworks.minio.IProgressListenerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.InputStream;
