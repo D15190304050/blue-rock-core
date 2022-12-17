@@ -9,8 +9,7 @@ import java.util.List;
 @Repository
 public interface FileUploadingTaskMapper
 {
-    int insert(FileUploadingTask row);
-    int updateUploadedBytesById(@Param("id") long id, @Param("newUpdatedByteCount") long newUpdatedByteCount);
+    int insert(FileUploadingTask fileUploadingTask);
     int setTaskStateById(long id, int state);
     FileUploadingTask getTaskById(long id);
 }

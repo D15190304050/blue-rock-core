@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -46,5 +47,10 @@ public class StorageObject
         this.name = fileMetadata.getFileName();
         this.updateTime = fileMetadata.getUpdateTime();
         this.inTrash = fileMetadata.getInTrash();
+    }
+
+    public static String randomObjectName()
+    {
+        return UUID.randomUUID().toString();
     }
 }

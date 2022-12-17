@@ -14,3 +14,9 @@ Query to get the id of the root directory for a user:
 ```SQL
 SELECT id FROM user_directory WHERE user_id = #{userId} AND parent_id = 0.
 ```
+
+## Uploading of large files
+References <br/>
+[1] https://blog.csdn.net/weixin_44359036/article/details/126514643 <br/>
+[2] https://zhuanlan.zhihu.com/p/444704253?utm_id=0
+

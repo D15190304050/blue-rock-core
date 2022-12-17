@@ -1,66 +1,34 @@
 package bluerock.domain;
 
-import java.util.Date;
+import bluerock.states.FileChunkState;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.Date;
+import java.util.List;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class FileChunk
 {
     private long id;
-
     private long taskId;
-
+    private long sliceIndex;
     private String objectName;
-
     private long byteCount;
-
     private Date uploadingTime;
+    private int state;
 
-    public long getId()
+    public static boolean allFinished(List<FileChunk> chunks)
     {
-        return id;
-    }
+        for (FileChunk chunk : chunks)
+        {
+            if (chunk.state == FileChunkState.UPLOADING)
+                return false;
+        }
 
-    public void setId(long id)
-    {
-        this.id = id;
-    }
-
-    public long getTaskId()
-    {
-        return taskId;
-    }
-
-    public void setTaskId(long taskId)
-    {
-        this.taskId = taskId;
-    }
-
-    public String getObjectName()
-    {
-        return objectName;
-    }
-
-    public void setObjectName(String objectName)
-    {
-        this.objectName = objectName == null ? null : objectName.trim();
-    }
-
-    public long getByteCount()
-    {
-        return byteCount;
-    }
-
-    public void setByteCount(long byteCount)
-    {
-        this.byteCount = byteCount;
-    }
-
-    public Date getUploadingTime()
-    {
-        return uploadingTime;
-    }
-
-    public void setUploadingTime(Date uploadingTime)
-    {
-        this.uploadingTime = uploadingTime;
+        return true;
     }
 }

@@ -15,6 +15,8 @@ mybatis:
     mapper-locations:
         - classpath:mappers/*.xml
 
+slice-byte-size: 5242880
+
 logging:
     pattern:
         console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%thread]){faint} %clr(%-40.40logger{39}){cyan} %L %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"

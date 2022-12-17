@@ -4,8 +4,7 @@
     <resultMap id="BaseResultMap" type="bluerock.domain.FileUploadingTask">
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="metadata_id" jdbcType="BIGINT" property="metadataId"/>
-        <result column="total_byte_count" jdbcType="BIGINT" property="totalByteCount"/>
-        <result column="uploaded_byte_count" jdbcType="BIGINT" property="uploadedByteCount"/>
+        <result column="chunk_count" jdbcType="BIGINT" property="chunkCount"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="creation_time" jdbcType="TIMESTAMP" property="creationTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
@@ -20,30 +19,18 @@
         INSERT INTO file_uploading_task
         (
             `metadata_id`,
-            `total_byte_count`,
-            `uploaded_byte_count`,
+            `chunk_count`,
             `user_id`,
-            `creation_time`,
-            `update_time`,
             `state`
         )
         VALUES
         (
             #{metadataId},
-            #{totalByteCount},
-            #{uploadedByteCount},
+            #{chunkCount},
             #{userId},
-            #{creationTime},
-            #{updateTime},
             #{state}
         )
     </insert>
-
-    <update id="updateUploadedBytesById">
-        UPDATE file_uploading_task
-        SET uploaded_byte_count = #{newUpdatedByteCount}
-        WHERE id = #{id}
-    </update>
 
     <update id="setTaskStateById">
         UPDATE file_uploading_task
@@ -55,8 +42,7 @@
         SELECT
             id,
             metadata_id,
-            total_byte_count,
-            uploaded_byte_count,
+            chunk_count,
             user_id,
             creation_time,
             update_time,

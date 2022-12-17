@@ -7,6 +7,13 @@
         <result column="object_name" jdbcType="VARCHAR" property="objectName"/>
         <result column="byte_count" jdbcType="BIGINT" property="byteCount"/>
         <result column="uploading_time" jdbcType="TIMESTAMP" property="uploadingTime"/>
+        <result column="state" property="state"/>
+        <result column="slice_index" property="sliceIndex"/>
+    </resultMap>
+
+    <resultMap id="ChunkStateMap" type="bluerock.results.FileChunkState">
+        <result column="slice_index" javaType="sliceIndex"/>
+        <result column="state" javaType="state"/>
     </resultMap>
 
     <select id="countFilePartsByTaskId" resultType="int">
@@ -23,23 +30,57 @@
         INSERT INTO file_chunk
         (
             task_id,
+            slice_index,
             object_name,
-            byte_count,
-            uploading_time
+            byte_count
         )
         VALUES
         (
             #{taskId},
+            #{sliceIndex},
             #{objectName},
-            #{byteCount},
-            #{uploadingTime}
+            #{byteCount}
         )
     </insert>
 
-    <select id="getPartNamesByTaskId" resultType="string">
+    <update id="setChunkUploaded">
+        UPDATE file_chunk
+        SET state = 1
+        WHERE id = #{chunkId}
+    </update>
+
+    <select id="getChunkNamesByTaskId" resultType="string">
         SELECT object_name
         FROM file_chunk
         WHERE task_id = #{taskId}
-        ORDER BY id
+        ORDER BY slice_index
+    </select>
+
+    <select id="getChunkStateByTaskIdAndSliceIndex" resultType="int">
+        SELECT state
+        FROM file_chunk
+        WHERE task_id = #{taskId}
+          AND slice_index = #{sliceIndex}
+    </select>
+
+    <select id="getChunksByTaskId" resultMap="BaseResultMap">
+        SELECT
+            id,
+            task_id,
+            slice_index,
+            state,
+            uploading_time,
+            object_name,
+            byte_count
+        FROM file_chunk
+        WHERE task_id = #{taskId}
+        ORDER BY slice_index
+    </select>
+
+    <select id="getChunkStatesByTaskId" resultMap="ChunkStateMap">
+        SELECT slice_index, state
+        FROM file_chunk
+        WHERE task_id = #{taskId}
+        ORDER BY slice_index
     </select>
 </mapper>

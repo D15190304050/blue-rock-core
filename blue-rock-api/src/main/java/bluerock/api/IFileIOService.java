@@ -1,19 +1,19 @@
 package bluerock.api;
 
 import bluerock.domain.FileMetadata;
-import bluerock.params.BatchMultipartFileParam;
-import bluerock.params.MultipartFileParam;
+import bluerock.params.*;
+import bluerock.results.FileUploadingState;
 import dataworks.web.commons.ServiceResponse;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.validation.annotation.Validated;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface IFileIOService
 {
     ServiceResponse<String> uploadFile(MultipartFileParam multipartFileParam);
-    ServiceResponse<Boolean> uploadFiles(BatchMultipartFileParam batchMultipartFileParam);
+    ServiceResponse<Long> initFileUploadingTask(InitFileUploadingTaskParam initFileUploadingTaskParam);
+    ServiceResponse<Boolean> uploadFileChunk(UploadFileChunkParam uploadFileChunkParam);
+    ServiceResponse<Boolean> mergeChunks(MergeChunksParam mergeChunksParam);
+    ServiceResponse<FileUploadingState> getChunkStates(GetChunkStatesParam getChunkStatesParam);
     boolean deleteFiles(List<FileMetadata> fileMetadataList);
 }

@@ -9,8 +9,7 @@
         <result column="url" jdbcType="VARCHAR" property="url"/>
         <result column="directory_id" jdbcType="BIGINT" property="directoryId"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
-        <result column="in_trash" jdbcType="INTEGER" property="inTrash"/>
-        <result column="update_time" property="updateTime"/>
+        <result column="state" jdbcType="INTEGER" property="state"/>
     </resultMap>
 
     <select id="showFilesByConditions" resultMap="BaseResultMap">
@@ -22,8 +21,7 @@
             url,
             directory_id,
             user_id,
-            update_time,
-            in_trash
+            state
         FROM file_metadata
         WHERE user_id = #{userId}
         <if test="parentDirectoryId != null">
@@ -56,14 +54,13 @@
                url,
                directory_id,
                user_id,
-               in_trash,
-               update_time
+               state
         FROM file_metadata
         WHERE id = #{id}
           AND user_id = #{userId}
     </select>
 
-    <insert id="insertNew">
+    <insert id="insert">
         <selectKey keyProperty="id" resultType="long" order="AFTER">
             select LAST_INSERT_ID()
         </selectKey>
@@ -73,12 +70,12 @@
             bucket_name,
             object_name,
             file_name,
-            url,
             directory_id,
-            user_id
+            user_id,
+            state
         )
         VALUES
-        (#{bucketName}, #{objectName}, #{fileName}, '', #{directoryId}, #{userId})
+        (#{bucketName}, #{objectName}, #{fileName}, #{directoryId}, #{userId}, #{inTrash})
     </insert>
 
     <select id="getFilesInDirectories" resultMap="BaseResultMap">
@@ -137,5 +134,9 @@
             </foreach>
     </update>
 
-
+    <update id="setUrlById">
+        UPDATE file_metadata
+        SET url = #{url}
+        WHERE id = #{id}
+    </update>
 </mapper>
