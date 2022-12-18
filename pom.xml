@@ -12,18 +12,17 @@
     </parent>
 
     <groupId>bluerock</groupId>
-    <artifactId>blue-rock</artifactId>
+    <artifactId>blue-rock-core</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>blue-rock-api</module>
-        <module>blue-rock-dao</module>
-        <module>blue-rock-domain</module>
-        <module>blue-rock-service</module>
-        <module>blue-rock-web</module>
-        <module>blue-rock-minio</module>
-        <module>blue-rock-minio</module>
+        <module>blue-rock-core-api</module>
+        <module>blue-rock-core-dao</module>
+        <module>blue-rock-core-domain</module>
+        <module>blue-rock-core-service</module>
+        <module>blue-rock-core-web</module>
+        <module>blue-rock-core-minio</module>
     </modules>
 
     <name>blue-rock</name>
