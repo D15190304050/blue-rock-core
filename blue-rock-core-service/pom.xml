@@ -9,9 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>blue-rock-service</artifactId>
+    <artifactId>blue-rock-core-service</artifactId>
 
-    <name>blue-rock-service</name>
+    <name>blue-rock-core-service</name>
     <build>
         <plugins>
             <plugin>
@@ -68,7 +68,7 @@
 
         <dependency>
             <groupId>bluerock</groupId>
-            <artifactId>blue-rock-minio</artifactId>
+            <artifactId>blue-rock-core-minio</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>

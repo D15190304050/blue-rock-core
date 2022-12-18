@@ -25,7 +25,7 @@
         <module>blue-rock-core-minio</module>
     </modules>
 
-    <name>blue-rock</name>
+    <name>blue-rock-core</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -9,9 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>blue-rock-minio</artifactId>
+    <artifactId>blue-rock-core-minio</artifactId>
 
-    <name>blue-rock-minio</name>
+    <name>blue-rock-core-minio</name>
 
     <properties>
         <okhttp.version>4.8.1</okhttp.version>

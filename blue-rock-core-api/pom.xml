@@ -9,9 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>blue-rock-api</artifactId>
+    <artifactId>blue-rock-core-api</artifactId>
 
-    <name>blue-rock-api</name>
+    <name>blue-rock-core-api</name>
     <build>
         <plugins>
             <plugin>

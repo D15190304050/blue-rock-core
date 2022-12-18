@@ -9,9 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>blue-rock-dao</artifactId>
+    <artifactId>blue-rock-core-dao</artifactId>
 
-    <name>blue-rock-dao</name>
+    <name>blue-rock-core-dao</name>
 
     <properties>
         <mybatis-generator.version>1.4.1</mybatis-generator.version>
