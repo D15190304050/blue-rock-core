@@ -9,7 +9,7 @@
         <result column="path" jdbcType="VARCHAR" property="path"/>
         <result column="creation_time" jdbcType="TIMESTAMP" property="creationTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-        <result column="in_trash" jdbcType="INTEGER" property="inTrash"/>
+        <result column="state" jdbcType="INTEGER" property="state"/>
     </resultMap>
 
     <select id="showDirectoriesByConditions" resultMap="BaseResultMap">
@@ -21,7 +21,7 @@
             path,
             creation_time,
             update_time,
-            in_trash
+            state
         FROM user_directory
         WHERE user_id = #{userId}
         <if test="parentDirectoryId != null">
@@ -62,7 +62,7 @@
             path,
             creation_time,
             update_time,
-            in_trash
+            state
         FROM user_directory
         WHERE id = #{id}
     </select>

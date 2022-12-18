@@ -25,5 +25,5 @@ public class UserDirectory
 
     private Date updateTime;
 
-    private int inTrash;
+    private int state;
 }

@@ -12,6 +12,26 @@
     <artifactId>blue-rock-core-web</artifactId>
 
     <name>blue-rock-core-web</name>
+
+
+    <properties>
+        <okhttp.version>4.8.1</okhttp.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>bluerock</groupId>
+            <artifactId>blue-rock-core-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -24,22 +44,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <okhttp.version>4.8.1</okhttp.version>
-    </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>bluerock</groupId>
-            <artifactId>blue-rock-service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>${okhttp.version}</version>
-        </dependency>
-    </dependencies>
 </project>

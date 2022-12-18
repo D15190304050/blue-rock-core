@@ -26,7 +26,7 @@
 
         <dependency>
             <groupId>bluerock</groupId>
-            <artifactId>blue-rock-dao</artifactId>
+            <artifactId>blue-rock-core-dao</artifactId>
             <version>${project.version}</version>
         </dependency>
 

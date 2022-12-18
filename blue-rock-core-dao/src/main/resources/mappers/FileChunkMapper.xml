@@ -12,8 +12,8 @@
     </resultMap>
 
     <resultMap id="ChunkStateMap" type="bluerock.results.FileChunkState">
-        <result column="slice_index" javaType="sliceIndex"/>
-        <result column="state" javaType="state"/>
+        <result column="slice_index" property="sliceIndex"/>
+        <result column="state" property="state"/>
     </resultMap>
 
     <select id="countFilePartsByTaskId" resultType="int">

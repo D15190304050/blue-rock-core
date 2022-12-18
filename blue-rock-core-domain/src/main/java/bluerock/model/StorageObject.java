@@ -23,7 +23,7 @@ public class StorageObject
     private long parentDirectoryId;
     private String name;
     private Date updateTime;
-    private int inTrash;
+    private int state;
 
     public StorageObject(UserDirectory userDirectory)
     {
@@ -34,7 +34,7 @@ public class StorageObject
         this.parentDirectoryId = userDirectory.getParentId();
         this.name = userDirectory.getName();
         this.updateTime = userDirectory.getUpdateTime();
-        this.inTrash = userDirectory.getInTrash();
+        this.state = userDirectory.getState();
     }
 
     public StorageObject(FileMetadata fileMetadata)
@@ -46,7 +46,7 @@ public class StorageObject
         this.parentDirectoryId = fileMetadata.getDirectoryId();
         this.name = fileMetadata.getFileName();
         this.updateTime = fileMetadata.getUpdateTime();
-        this.inTrash = fileMetadata.getInTrash();
+        this.state = fileMetadata.getState();
     }
 
     public static String randomObjectName()
